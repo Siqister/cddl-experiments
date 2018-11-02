@@ -11,13 +11,13 @@ Each particle has a built-in "shelf life". It will gradually fade in at the begi
 
 The *decay* parameter governs how quickly a particle's "shelf life" progresses. A higher decay means that particles will generally not stray too far from their original positions, and it will also cause a "twinkling" effect.
 
-## Random walk
+### Random walk
 Each particle has the built-in tendency to "walk randomly". This parameter controls the speed of this kind of motion.
 
-## Angular speed
+### Angular speed
 Controls the speed at which particles spin around the center.
 
-## Radial speed
+### Radial speed
 Controls the speed at which particles move away from the center. Particles will tend to accelerate from the center, and gradually slow down towards the edge.
 
 ## Mixing and matching motion parameters
