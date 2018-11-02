@@ -21,11 +21,14 @@ const colorRamp = [
 
 //Generate data for random instances
 //Colors, offsets, and rotations are for per instance attributes
-const MAX_INSTANCES = 5000;
+const MAX_INSTANCES = 8000;
 const positions = new Float32Array([
-  5.0, 0.0, 
-  -0.1, 3.0, 
-  -0.1, -3.0,
+  3.0, 1.8,
+  -3.0, 1.8,
+  -3.0, -1.8,
+  -3.0, -1.8,
+  3.0, -1.8,
+  3.0, 1.8
 ]); //triangular vertices of each instance
 const colors = new Float32Array(
 	Array
@@ -36,11 +39,11 @@ const colors = new Float32Array(
 		})
 		.reduce((acc,v) => acc.concat(v), [])
 );
-const randomNormal = d3.randomNormal(.5,.2);
+const randomNormal = d3.randomNormal(.3,.2);
 const offsets = new Float32Array(
 	Array
 		.from({length:MAX_INSTANCES})
-		.map(() => [(randomNormal() + 0.3)*canvas.height/2, Math.random()*Math.PI*2])
+		.map(() => [(randomNormal() + 0.5)*canvas.height/2, Math.random()*Math.PI*2])
 		.map(([r, theta]) => [r * Math.cos(theta)+canvas.width/2, r * Math.sin(theta)+canvas.height/2])
 		.reduce((acc,v) => acc.concat(v), [])
 );
@@ -56,9 +59,10 @@ const age = new Float32Array(
 )
 //Motion parameters
 const motionParams = {
-	decay:0.005,
+	decay:0.009,
 	randomWalkSpeed:0.5,
-	angularSpeed:1.0
+	angularSpeed:1.0,
+	radialSpeed: 2.0
 }
 
 //Compile shaders and programs
@@ -78,6 +82,7 @@ const tf_uHLocation = gl.getUniformLocation(tfProgram, 'u_h');
 const tf_uDecay = gl.getUniformLocation(tfProgram, 'u_decay');
 const tf_uRandomWalkSpeed = gl.getUniformLocation(tfProgram, 'u_random_walk_speed');
 const tf_uCircularSpeed = gl.getUniformLocation(tfProgram, 'u_circular_speed');
+const tf_uRadialSpeed = gl.getUniformLocation(tfProgram, 'u_radial_speed');
 
 //Initialize two sets of VAOs and transformFeedBack objects, to be ping-ponged
 const {vaos, tfs, buffers} = initVAOs(gl);
@@ -105,6 +110,7 @@ function initGL(){
 	gl.uniform1f(tf_uDecay, motionParams.decay);
 	gl.uniform1f(tf_uRandomWalkSpeed, motionParams.randomWalkSpeed);
 	gl.uniform1f(tf_uCircularSpeed, motionParams.angularSpeed);
+	gl.uniform1f(tf_uRadialSpeed, motionParams.radialSpeed);
 }
 
 function transform(){
@@ -156,7 +162,7 @@ function render(){
   gl.vertexAttribDivisor(OFFSET_LOCATION, 1);
   gl.vertexAttribDivisor(ROTATION_LOCATION, 1);
   gl.vertexAttribDivisor(AGE_LOCATION, 1);
-  gl.drawArraysInstanced(gl.TRIANGLES, 0, 3, MAX_INSTANCES);
+  gl.drawArraysInstanced(gl.TRIANGLES, 0, 6, MAX_INSTANCES);
 
   requestAnimationFrame(render);
 }
@@ -176,6 +182,10 @@ f1.add(motionParams, 'randomWalkSpeed', 0, 2.0).onChange(val => {
 f1.add(motionParams, 'angularSpeed', 0, 4.0).onChange(val => {
 	gl.useProgram(tfProgram);
 	gl.uniform1f(tf_uCircularSpeed, motionParams.angularSpeed);
+});
+f1.add(motionParams, 'radialSpeed', 0, 4.0).onChange(val => {
+	gl.useProgram(tfProgram);
+	gl.uniform1f(tf_uRadialSpeed, motionParams.radialSpeed);
 });
 
 

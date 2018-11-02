@@ -89,6 +89,7 @@ const transformVs = `#version 300 es
   uniform float u_h;
   uniform float u_random_walk_speed;
   uniform float u_circular_speed;
+  uniform float u_radial_speed;
   uniform float u_decay;
 
   layout(location = OFFSET_LOCATION) in vec2 a_offset;
@@ -120,7 +121,6 @@ const transformVs = `#version 300 es
     //compute target vec2 to move towards at each step
     vec2 p = WANDER_CIRCLE_R * vec2(cos(theta), sin(theta)) + vec2(WANDER_CIRCLE_OFFSET, 0.0);
     vec2 target = normalize(rot * p);
-
     //Move each particle towards target, and record rotation
     v_rotation = atan(target.y, target.x);
     v_offset = a_offset + u_random_walk_speed * target;
@@ -131,6 +131,13 @@ const transformVs = `#version 300 es
       vec3(0.0, 0.0, 1.0)
     ).xy;
     v_offset = v_offset + u_circular_speed * normalize(tangent);
+
+    //RADIAL MOTION
+    //Accelerate from center then gradually slow down
+    vec2 radial = vec2(a_offset.x - u_w/2.0, a_offset.y - u_h/2.0);
+    float radialDistanceToCenter = length(radial);
+    radial = normalize(radial);
+    v_offset = v_offset + u_radial_speed * radial * (1.0 - radialDistanceToCenter / u_h);
 
     //Output new v_age
     v_age = a_age + u_decay;
