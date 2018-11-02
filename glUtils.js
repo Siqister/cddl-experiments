@@ -45,7 +45,7 @@ const initVAOs = gl => {
 	for(let i = 0; i < vaos.length; i++){
 		const vao = vaos[i];
 		const tf = tfs[i];
-		buffers[i] = new Array(4);
+		buffers[i] = new Array(6);
 		const buffer = buffers[i];
 
 		//Set up VAO i.e. buffer state
@@ -78,6 +78,20 @@ const initVAOs = gl => {
     gl.enableVertexAttribArray(COLOR_LOCATION);
     gl.vertexAttribDivisor(COLOR_LOCATION, 1); //attribute is used once per instance
 
+    buffer[AGE_LOCATION] = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, buffer[AGE_LOCATION]);
+    gl.bufferData(gl.ARRAY_BUFFER, age, gl.STREAM_COPY);
+    gl.vertexAttribPointer(AGE_LOCATION, 1, gl.FLOAT, false, 0, 0);
+    gl.enableVertexAttribArray(AGE_LOCATION);
+    gl.vertexAttribDivisor(AGE_LOCATION, 1);
+
+    buffer[INIT_OFFSET_LOCATION] = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, buffer[INIT_OFFSET_LOCATION]);
+    gl.bufferData(gl.ARRAY_BUFFER, offsets, gl.STATIC_DRAW);
+    gl.vertexAttribPointer(INIT_OFFSET_LOCATION, 2, gl.FLOAT, false, 0, 0);
+    gl.enableVertexAttribArray(INIT_OFFSET_LOCATION);
+    gl.vertexAttribDivisor(INIT_OFFSET_LOCATION, 0);
+
 		gl.bindVertexArray(null);
 		gl.bindBuffer(gl.ARRAY_BUFFER, null);
 
@@ -85,6 +99,7 @@ const initVAOs = gl => {
 		gl.bindTransformFeedback(gl.TRANSFORM_FEEDBACK, tf);
 		gl.bindBufferBase(gl.TRANSFORM_FEEDBACK_BUFFER, 0, buffer[OFFSET_LOCATION]);
 		gl.bindBufferBase(gl.TRANSFORM_FEEDBACK_BUFFER, 1, buffer[ROTATION_LOCATION]);
+		gl.bindBufferBase(gl.TRANSFORM_FEEDBACK_BUFFER, 2, buffer[AGE_LOCATION]);
 		gl.bindTransformFeedback(gl.TRANSFORM_FEEDBACK, null);
 
 	}
