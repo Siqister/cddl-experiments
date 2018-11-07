@@ -21,14 +21,14 @@ const colorRamp = [
 
 //Generate data for random instances
 //Colors, offsets, and rotations are for per instance attributes
-const MAX_INSTANCES = 8000;
+const MAX_INSTANCES = 4000;
 const positions = new Float32Array([
-  3.0, 1.8,
-  -3.0, 1.8,
-  -3.0, -1.8,
-  -3.0, -1.8,
-  3.0, -1.8,
-  3.0, 1.8
+  6.0, 3.5,
+  -6.0, 3.5,
+  -6.0, -3.5,
+  -6.0, -3.5,
+  6.0, -3.5,
+  6.0, 3.5
 ]); //triangular vertices of each instance
 const colors = new Float32Array(
 	Array
