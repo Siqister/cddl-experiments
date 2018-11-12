@@ -37,7 +37,7 @@ const createProgram = (gl, vs, fs, ...varyings) => {
 	return program;
 }
 
-const initVAOs = gl => {
+const initVAOs = (gl, offsets, rotations, positions, colors, age) => {
 	const vaos = [gl.createVertexArray(), gl.createVertexArray()];
 	const tfs = [gl.createTransformFeedback(), gl.createTransformFeedback()];
 	const buffers = new Array(vaos.length);
