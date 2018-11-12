@@ -19,9 +19,44 @@ const colorRamp = [
 	191,142,192
 ].map(d => d/255);
 
+//This simulates the proportions across ten categories
+//This affects 
+
+const proportions = Array.from({
+		length: 10 //10 categories of cards
+	}).map(d => Math.round(Math.random()*100));
+
+// const proportions = [
+// 	4,
+// 	900,
+// 	600,
+// 	2,
+// 	3,
+// 	3,
+// 	4,
+// 	4,
+// 	700,
+// 	1
+// ]
+
+const sum = proportions.reduce((total,v) => total+v, 0);
+
 //Generate data for random instances
 //Colors, offsets, and rotations are for per instance attributes
 const MAX_INSTANCES = 4000;
+
+//4000 element array of categories (0-9)
+const categories = proportions.map((count,i) => 
+		Array.from({length: Math.ceil(count/sum*MAX_INSTANCES)}).map(d => i)
+	)
+	.reduce((acc,v) => acc.concat(v), []);
+const categoriesShuffled = [];
+for(let i = 0; i < MAX_INSTANCES; i++){
+	categoriesShuffled.push(categories[Math.round(Math.random()*categories.length)]);
+}
+console.log(categoriesShuffled);
+
+//Attribute data
 const positions = new Float32Array([
   6.0, 3.5,
   -6.0, 3.5,
@@ -34,19 +69,38 @@ const colors = new Float32Array(
 	Array
 		.from({length:MAX_INSTANCES})
 		.map((d,i) => {
-			const color = i%10;
-			return [colorRamp[color], colorRamp[color+1], colorRamp[color+2]];
+			const cat = categoriesShuffled[i]?categoriesShuffled[i]:0; //between 0 and 9
+			return [colorRamp[cat*3], colorRamp[cat*3+1], colorRamp[cat*3+2]];
 		})
 		.reduce((acc,v) => acc.concat(v), [])
 );
 const randomNormal = d3.randomNormal(.3,.2);
+
+//offsets: random distribution around a circle
+// const offsets = new Float32Array(
+// 	Array
+// 		.from({length:MAX_INSTANCES})
+// 		.map(() => [(randomNormal() + 0.5)*canvas.height/2, Math.random()*Math.PI*2])
+// 		.map(([r, theta]) => [r * Math.cos(theta)+canvas.width/2, r * Math.sin(theta)+canvas.height/2])
+// 		.reduce((acc,v) => acc.concat(v), [])
+// );
+//offsets: pie chart like distribution
+const proportionAngles = d3.pie().sortValues(null)(proportions);
 const offsets = new Float32Array(
 	Array
 		.from({length:MAX_INSTANCES})
-		.map(() => [(randomNormal() + 0.5)*canvas.height/2, Math.random()*Math.PI*2])
+		.map((d,i) => {
+			const cat = categoriesShuffled[i]?categoriesShuffled[i]:0;
+			const {startAngle, endAngle} = proportionAngles[cat]; 
+			const angle = startAngle + Math.random()*(endAngle - startAngle);
+			const r = (randomNormal() + 0.5)*canvas.height/2;
+			return [r, angle];
+		})
 		.map(([r, theta]) => [r * Math.cos(theta)+canvas.width/2, r * Math.sin(theta)+canvas.height/2])
 		.reduce((acc,v) => acc.concat(v), [])
-);
+)
+
+
 const rotations = new Float32Array(
 	Array
 		.from({length:MAX_INSTANCES})
